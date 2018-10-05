@@ -4,15 +4,8 @@ public class User {
 
     private String username;
     private String status;
-    private String imageUrl;
-    private String thumbImageUrl;
-
-//    public User(String username, String status, String imageUrl, String thumbImageUrl){
-//        this.username = username;
-//        this.status = status;
-//        this.imageUrl = imageUrl;
-//        this.thumbImageUrl = thumbImageUrl;
-//    }
+    private String image;
+    private String thumb_Image;
 
     public User(){
 
@@ -26,12 +19,12 @@ public class User {
         this.status = status;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    public void setThumbImageUrl(String thumbImageUrl) {
-        this.thumbImageUrl = thumbImageUrl;
+    public void setThumb_Image(String thumb_Image) {
+        this.thumb_Image = thumb_Image;
     }
 
     public String getUsername() {
@@ -42,12 +35,12 @@ public class User {
         return status;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImage() {
+        return image;
     }
 
-    public String getThumbImageUrl() {
-        return thumbImageUrl;
+    public String getThumb_Image() {
+        return thumb_Image;
     }
 
 }

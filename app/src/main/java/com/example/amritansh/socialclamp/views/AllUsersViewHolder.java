@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.amritansh.socialclamp.R;
@@ -36,19 +35,14 @@ public class AllUsersViewHolder extends RecyclerView.ViewHolder {
 
         userAvtar = itemView.findViewById(R.id.useravtar);
 
+        Log.d("console log", "imageurlprofile" + model.getImage());
+
             Picasso.get()
-                   .load(model.getImageUrl())
+                   .load(model.getImage())
                    .placeholder(R.drawable.useravtar)
                    .into(userAvtar);
 
             username.setText(model.getUsername());
             userStatus.setText(model.getStatus());
     }
-
-//    public void setUsername(String username) {
-//
-//        Log.d("console log", "set up data" + username);
-//        this.username = mView.findViewById(R.id.username);
-//        this.username.setText(username);
-//    }
 }

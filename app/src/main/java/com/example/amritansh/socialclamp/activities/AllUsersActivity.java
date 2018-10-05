@@ -89,8 +89,6 @@ public class AllUsersActivity extends BaseActivity {
             @Override
             protected void onBindViewHolder(@NonNull AllUsersViewHolder holder, int position, @NonNull User model) {
                 holder.setDisplayData(model);
-                Log.d("console log", "adapterposition" + position);
-//                holder.setUsername(model.getUsername());
             }
         };
         adapter.startListening();
