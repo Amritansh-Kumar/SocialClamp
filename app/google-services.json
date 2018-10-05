@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1038128213904",
+    "firebase_url": "https://socialclamp.firebaseio.com",
+    "project_id": "socialclamp",
+    "storage_bucket": "socialclamp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1038128213904:android:8f35db161686dc1f",
+        "android_client_info": {
+          "package_name": "com.example.amritansh.socialclamp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1038128213904-9c8ec23khapsplfj2i5ud1251irg6u5c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.amritansh.socialclamp",
+            "certificate_hash": "b4ece08875e5a81a54dbf9ab7dd2853a3a603438"
+          }
+        },
+        {
+          "client_id": "1038128213904-ukb24f44svfqhgpqt64b3q0061arpffu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7QtbbQ5gR38_611oHCXIBbX2Y-VzPuaw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1038128213904-ukb24f44svfqhgpqt64b3q0061arpffu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

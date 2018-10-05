@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SocialClamp</string>
+    <string name="logout">logout</string>
+
+    <string name="settings">settings</string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="change_status">Change Status</string>
+    <string name="change_image">Change Image</string>
+</resources>
