@@ -1,6 +1,7 @@
 package com.example.amritansh.socialclamp.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,10 +26,17 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
 public class AccountSettingActivity extends BaseActivity {
 
@@ -96,12 +104,14 @@ public class AccountSettingActivity extends BaseActivity {
                 mUsername.setText(username);
                 mStatus.setText(status);
 
-                Picasso.get()
-                       .load(image)
-                       .resize(50, 50)
-                       .centerCrop()
-                       .placeholder(R.drawable.useravtar)
-                       .into(userAvtar);
+                if (!image.matches("default")){
+                    Picasso.get()
+                           .load(image)
+                           .resize(50, 50)
+                           .centerCrop()
+                           .placeholder(R.drawable.useravtar)
+                           .into(userAvtar);
+                }
 
                 // TODO : dismiss progress bar
             }
@@ -160,34 +170,86 @@ public class AccountSettingActivity extends BaseActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 Uri resultUri = result.getUri();
-                uploadImage(resultUri);
+
+                File thumb_file =  new File(resultUri.getPath());
+                Bitmap thumb_bitmap = null;
+                try {
+                    thumb_bitmap = new Compressor(this)
+                            .setMaxWidth(200)
+                            .setMaxHeight(200)
+                            .setQuality(100)
+                            .compressToBitmap
+                            (thumb_file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                uploadImage(resultUri, thumb_bitmap);
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
             }
         }
     }
 
-    private void uploadImage(Uri resultUri) {
-        String fileName = currentUser.getUid() + ".jpg";
+    private void uploadImage(Uri resultUri, final Bitmap thumb_bitmap) {
+        // file name
+        final String fileName = currentUser.getUid() + ".jpg";
+        // image storage reference
         final StorageReference reference = mStorageRef.child(currentUser.getUid()).child(fileName);
-
+        // uploading file to firebase
         reference.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-
+                // getting image download url
                 reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        String downloadUrl = uri.toString();
+                        final String downloadUrl = uri.toString();
 
-                        mReference.child("image").setValue(downloadUrl).addOnCompleteListener
-                                (new OnCompleteListener<Void>() {
+                        // getting byte from thumb_image bitmap
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                        byte[] data = baos.toByteArray();
+                        // storage reference for thumb_image
+                        final StorageReference thumbReference = mStorageRef.child(currentUser
+                                .getUid()).child("thumb_image").child(fileName);
+                        // uploading thumb_image
+                        UploadTask uploadTask = thumbReference.putBytes(data);
+                        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot>
+                                                           thumb_task) {
+                                // getting thumb_image download url
+                                thumbReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        // TODO : dismiss progress bar
+                                    public void onSuccess(Uri uri) {
+                                        String thumbDownloadUrl = uri.toString();
 
+                                        Map updateDetailsHashmap = new HashMap();
+                                        updateDetailsHashmap.put("image", downloadUrl);
+                                        updateDetailsHashmap.put("thumb_image", thumbDownloadUrl);
+
+                                        mReference.updateChildren(updateDetailsHashmap)
+                                                  .addOnSuccessListener(new OnSuccessListener() {
+                                                      @Override
+                                                      public void onSuccess(Object o) {
+
+                                                      }
+                                                  });
                                     }
                                 });
+                            }
+                        });
+
+//                        mReference.child("image").setValue(downloadUrl).addOnCompleteListener
+//                                (new OnCompleteListener<Void>() {
+//                                    @Override
+//                                    public void onComplete(@NonNull Task<Void> task) {
+//                                        // TODO : dismiss progress bar
+//
+//                                    }
+//                                });
                     }
                 });
             }

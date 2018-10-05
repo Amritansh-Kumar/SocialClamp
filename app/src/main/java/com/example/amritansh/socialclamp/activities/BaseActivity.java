@@ -109,6 +109,9 @@ public abstract class BaseActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
                 break;
+
+            case android.R.id.home:
+                onBackPressed();
         }
 
         return true;
