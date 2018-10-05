@@ -49,7 +49,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         // TODO : handle no internet connection
     }
 
-    private void handleToolbar(){
+    private void handleToolbar() {
         if (showActionBar()) {
             toolbar = findViewById(R.id.toolbar_main);
             setSupportActionBar(toolbar);
@@ -72,17 +72,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void replaceFragment(int containerId, Fragment fragment, boolean addToBackStack){
+    public void replaceFragment(int containerId, Fragment fragment, boolean addToBackStack) {
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
 
         if (fragment != null) {
             transaction.replace(containerId, fragment);
-            if(addToBackStack){
+            if (addToBackStack) {
                 transaction.addToBackStack(null);
             }
             transaction.commit();
-        }else {
+        } else {
             Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
@@ -96,19 +96,28 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
-            case R.id.settings :
+        switch (item.getItemId()) {
+            case R.id.settings: {
                 Intent settingIntent = new Intent(this, AccountSettingActivity.class);
                 startActivity(settingIntent);
                 finish();
                 break;
+            }
 
-            case R.id.logout :
+            case R.id.logout: {
                 mAuth.signOut();
                 Intent intent = new Intent(this, AuthenticationActivity.class);
                 startActivity(intent);
                 finish();
                 break;
+            }
+
+            case R.id.all_users: {
+                Intent allUsersIntent = new Intent(this, AllUsersActivity.class);
+                startActivity(allUsersIntent);
+                finish();
+                break;
+            }
 
             case android.R.id.home:
                 onBackPressed();

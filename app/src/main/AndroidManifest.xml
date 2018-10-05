@@ -26,12 +26,16 @@
         <activity
             android:name=".activities.AccountSettingActivity"
             android:parentActivityName=".activities.HomeActivity" />
-        <activity android:name=".activities.UpdateStatusActivity"
-            android:parentActivityName=".activities.AccountSettingActivity"/>
+        <activity
+            android:name=".activities.UpdateStatusActivity"
+            android:parentActivityName=".activities.AccountSettingActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat"
-            android:parentActivityName=".activities.AccountSettingActivity"/>
+            android:parentActivityName=".activities.AccountSettingActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
+        <activity
+            android:name=".activities.AllUsersActivity"
+            android:parentActivityName=".activities.HomeActivity" />
     </application>
 
 </manifest>

@@ -1,7 +1,6 @@
 package com.example.amritansh.socialclamp.activities;
 
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.example.amritansh.socialclamp.R;
