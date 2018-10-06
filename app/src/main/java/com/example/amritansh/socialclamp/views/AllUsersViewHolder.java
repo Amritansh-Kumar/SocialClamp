@@ -35,7 +35,7 @@ public class AllUsersViewHolder extends RecyclerView.ViewHolder {
 
         userAvtar = itemView.findViewById(R.id.useravtar);
 
-        Log.d("console log", "imageurlprofile" + model.getImage());
+        Log.d("console log", "imageurlprofile" + model.getThumb_image());
 
             Picasso.get()
                    .load(model.getImage())
