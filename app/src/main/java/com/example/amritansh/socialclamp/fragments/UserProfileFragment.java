@@ -30,6 +30,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +51,7 @@ public class UserProfileFragment extends Fragment {
     private DatabaseReference userProfileRef;
     private DatabaseReference friendRequestRef;
     private DatabaseReference friendDatabaseRef;
+    private DatabaseReference mNotificationRef;
     private FirebaseUser currentUser;
 
     private String friendId;
@@ -96,6 +98,8 @@ public class UserProfileFragment extends Fragment {
         friendRequestRef = FirebaseDatabase.getInstance().getReference().child("friend_request");
 
         friendDatabaseRef = FirebaseDatabase.getInstance().getReference().child("friends");
+
+        mNotificationRef = FirebaseDatabase.getInstance().getReference().child("notifications");
 
         userProfileRef = FirebaseDatabase.getInstance().getReference().child("Users")
                                          .child(friendId);
@@ -244,9 +248,18 @@ public class UserProfileFragment extends Fragment {
 
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        requestButton.setEnabled(true);
-                                        currentStatus = REQUEST_SENT;
-                                        requestButton.setText(CANCEL_FRIEND_REQUEST);
+
+                                        HashMap<String, String> notificatinData = genereteNotificationData(currentUser.getUid(),
+                                                        "request");
+                                        mNotificationRef.child(friendId).push().setValue
+                                                (notificatinData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                requestButton.setEnabled(true);
+                                                currentStatus = REQUEST_SENT;
+                                                requestButton.setText(CANCEL_FRIEND_REQUEST);
+                                            }
+                                        });
                                     }
 
                                  });
@@ -274,7 +287,12 @@ public class UserProfileFragment extends Fragment {
                                    requestButton.setText(SEND_FRIEND_REQUEST);
                                }
 
-                           });
+                           }).addOnFailureListener(new OnFailureListener() {
+                           @Override
+                           public void onFailure(@NonNull Exception e) {
+                               requestButton.setEnabled(true);
+                           }
+                       });
                    }
 
               });
@@ -360,5 +378,14 @@ public class UserProfileFragment extends Fragment {
         View container = getActivity().findViewById(R.id.user_container);
         container.setVisibility(View.GONE);
         userView.setVisibility(View.VISIBLE);
+    }
+
+
+    private HashMap<String, String> genereteNotificationData(String senderId, String requestType){
+        HashMap<String, String> notificationMap = new HashMap<>();
+        notificationMap.put("from", senderId);
+        notificationMap.put("type", requestType);
+
+        return  notificationMap;
     }
 }
