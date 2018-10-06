@@ -8,10 +8,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.amritansh.socialclamp.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,15 +27,24 @@ import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class UserProfileFragment extends Fragment {
 
     private static final String USER_ID = "userId";
+    private static final String SEND_FRIEND_REQUEST = "SEND FRIEND REQUEST";
+    private static final String CANCEL_FRIEND_REQUEST = "CANCEL FRIEND REQUEST";
+    private static final String ACCEPT_FRIEND_REQUEST = "ACCEPT FRIEND REQUEST";
+    private static final String REQUEST_SENT = "request_sent";
+    private static final String REQUEST_RECEIVED = "request_received";
+    private static final String NOT_FRIENDS = "not_friends";
 
-    private DatabaseReference currentRef;
-    private DatabaseReference userRef;
     private DatabaseReference userProfileRef;
+    private DatabaseReference friendRequestRef;
     private FirebaseUser currentUser;
+
+    private String friendId;
+    private String currentStatus = NOT_FRIENDS;
 
     @BindView(R.id.username)
     TextView username;
@@ -39,6 +52,8 @@ public class UserProfileFragment extends Fragment {
     TextView userStatus;
     @BindView(R.id.user_avtar)
     ImageView userImage;
+    @BindView(R.id.request_btn)
+    Button requestButton;
 
     public UserProfileFragment() {
     }
@@ -66,19 +81,14 @@ public class UserProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         Bundle bundle = getArguments();
-        String friendId = bundle.getString(USER_ID);
-        Log.d("consolelog", "consoleuserid" + friendId);
+        friendId = bundle.getString(USER_ID);
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        currentRef = FirebaseDatabase.getInstance().getReference().child("friend_requests")
-                                     .child(currentUser.getUid());
-        Log.d("console", "consoleuserid" + currentUser.getUid());
-        userRef = FirebaseDatabase.getInstance().getReference().child("friend_requests")
-                                  .child(friendId);
+
+        friendRequestRef = FirebaseDatabase.getInstance().getReference().child("friend_request");
 
         userProfileRef = FirebaseDatabase.getInstance().getReference().child("Users")
-                                  .child(friendId);
-
+                                         .child(friendId);
         fillUserData();
     }
 
@@ -97,6 +107,41 @@ public class UserProfileFragment extends Fragment {
                        .load(thumbImage)
                        .placeholder(R.drawable.useravtar)
                        .into(userImage);
+
+                // ____________________ REQUEST STATE ______________
+                friendRequestRef.child("friend_request").addListenerForSingleValueEvent(new
+                                                                                       ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild(friendId)){
+                            String requestType = dataSnapshot.child(friendId).child("request_type")
+                                    .getValue().toString();
+
+                            switch (requestType){
+
+                                case "send":{
+                                    currentStatus = REQUEST_SENT;
+                                    requestButton.setText(CANCEL_FRIEND_REQUEST);
+                                    break;
+                                }
+                                case "received":{
+                                    currentStatus = REQUEST_RECEIVED;
+                                    requestButton.setText(ACCEPT_FRIEND_REQUEST);
+                                    break;
+                                }
+                                default:{
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
             }
 
             @Override
@@ -104,6 +149,60 @@ public class UserProfileFragment extends Fragment {
 
             }
         });
+    }
+
+
+    @OnClick(R.id.request_btn)
+    void acceptOrSendRequest(){
+
+        requestButton.setEnabled(false);
+
+        // _____________________ SEND FRIEND REQUEST _______________________
+        if (currentStatus.equals("not_friends")){
+            friendRequestRef.child(currentUser.getUid()).child(friendId).child("request_type").setValue
+                    ("send")
+                                             .addOnCompleteListener
+                    (new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        friendRequestRef.child(friendId).child(currentUser.getUid()).child
+                                ("request_type")
+                                                                     .setValue("received")
+                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                         @Override
+                                         public void onSuccess(Void aVoid) {
+                                             requestButton.setEnabled(true);
+                                             currentStatus = REQUEST_SENT;
+                                             requestButton.setText(CANCEL_FRIEND_REQUEST);
+                                         }
+                                     });
+                    }
+                }
+            });
+        }
+
+        // ________________________ CANCEL FRIEND REQEUST ___________________________
+        if (currentStatus.equals("request_sent")){
+            friendRequestRef.child(currentUser.getUid()).child(friendId).removeValue()
+                            .addOnSuccessListener(new
+                                                                                         OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    friendRequestRef.child(friendId).child(currentUser.getUid()).removeValue()
+                                                                 .addOnSuccessListener(new
+                                                                                                 OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            requestButton.setEnabled(true);
+                            currentStatus = NOT_FRIENDS;
+                            requestButton.setText(SEND_FRIEND_REQUEST);
+                        }
+                    });
+                }
+            });
+        }
+
     }
 
     @Override
