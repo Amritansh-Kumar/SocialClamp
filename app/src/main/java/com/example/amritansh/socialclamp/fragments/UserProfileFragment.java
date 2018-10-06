@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.amritansh.socialclamp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -101,6 +102,7 @@ public class UserProfileFragment extends Fragment {
         fillUserData();
     }
 
+    // getting user profile and displaying it
     private void fillUserData() {
         userProfileRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -116,41 +118,8 @@ public class UserProfileFragment extends Fragment {
                        .placeholder(R.drawable.useravtar)
                        .into(userImage);
 
-                // ____________________ REQUEST STATE ______________
-                friendRequestRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild(currentUser.getUid())) {
 
-                            String requestType = dataSnapshot.child(currentUser.getUid()).child(friendId)
-                                                             .child("request_type").getValue().toString();
-
-                            switch (requestType) {
-
-                                case "send": {
-                                    currentStatus = REQUEST_SENT;
-                                    requestButton.setText(CANCEL_FRIEND_REQUEST);
-                                    break;
-                                }
-                                case "received": {
-                                    currentStatus = REQUEST_RECEIVED;
-                                    requestButton.setText(ACCEPT_FRIEND_REQUEST);
-                                    break;
-                                }
-                                default: {
-                                    break;
-                                }
-                            }
-                        }else {
-                            checkIsFriendStatus();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
+                getRequestState();
 
             }
 
@@ -161,7 +130,63 @@ public class UserProfileFragment extends Fragment {
         });
     }
 
+
+    // checking the request status of friend request
+    private void getRequestState(){
+        // ________________ REQUEST STATE ______________
+
+        friendRequestRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild(currentUser.getUid())) {
+
+                    friendRequestRef.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.hasChild(friendId)){
+
+                                String requestType = dataSnapshot.child(friendId)
+                                                                 .child("request_type").getValue().toString();
+
+                                switch (requestType) {
+
+                                    case "send": {
+                                        currentStatus = REQUEST_SENT;
+                                        requestButton.setText(CANCEL_FRIEND_REQUEST);
+                                        break;
+                                    }
+                                    case "received": {
+                                        currentStatus = REQUEST_RECEIVED;
+                                        requestButton.setText(ACCEPT_FRIEND_REQUEST);
+                                        break;
+                                    }
+                                    default: {
+                                        break;
+                                    }
+                                }
+                            }else {
+                                checkIsFriendStatus();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    // checking if already friend
     private void checkIsFriendStatus(){
+
         friendRequestRef.child(currentUser.getUid())
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -305,6 +330,7 @@ public class UserProfileFragment extends Fragment {
 
 
     private void unfriendUser(){
+
         friendDatabaseRef.child(currentUser.getUid()).child(friendId)
                          .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
