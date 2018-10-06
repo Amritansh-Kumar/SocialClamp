@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.amritansh.socialclamp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,8 +23,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,12 +40,15 @@ public class UserProfileFragment extends Fragment {
     private static final String SEND_FRIEND_REQUEST = "SEND FRIEND REQUEST";
     private static final String CANCEL_FRIEND_REQUEST = "CANCEL FRIEND REQUEST";
     private static final String ACCEPT_FRIEND_REQUEST = "ACCEPT FRIEND REQUEST";
+    private static final String UNFRIEND = "UNFRIEND";
     private static final String REQUEST_SENT = "request_sent";
     private static final String REQUEST_RECEIVED = "request_received";
     private static final String NOT_FRIENDS = "not_friends";
+    private static final String FRIENDS = "friends";
 
     private DatabaseReference userProfileRef;
     private DatabaseReference friendRequestRef;
+    private DatabaseReference friendDatabaseRef;
     private FirebaseUser currentUser;
 
     private String friendId;
@@ -85,6 +93,8 @@ public class UserProfileFragment extends Fragment {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         friendRequestRef = FirebaseDatabase.getInstance().getReference().child("friend_request");
+
+        friendDatabaseRef = FirebaseDatabase.getInstance().getReference().child("friends");
 
         userProfileRef = FirebaseDatabase.getInstance().getReference().child("Users")
                                          .child(friendId);
@@ -131,6 +141,8 @@ public class UserProfileFragment extends Fragment {
                                     break;
                                 }
                             }
+                        }else {
+                            checkIsFriendStatus();
                         }
                     }
 
@@ -147,6 +159,24 @@ public class UserProfileFragment extends Fragment {
 
             }
         });
+    }
+
+    private void checkIsFriendStatus(){
+        friendRequestRef.child(currentUser.getUid())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.hasChild(friendId)){
+                                    currentStatus = FRIENDS;
+                                    requestButton.setText(UNFRIEND);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
     }
 
 
@@ -168,8 +198,9 @@ public class UserProfileFragment extends Fragment {
         else if(currentStatus.equals(REQUEST_RECEIVED)) {
             acceptFriendRequest();
         }
-
-
+        else if (currentStatus.equals(FRIENDS)){
+            unfriendUser();
+        }
 
     }
 
@@ -178,45 +209,122 @@ public class UserProfileFragment extends Fragment {
         friendRequestRef.child(currentUser.getUid()).child(friendId)
             .child("request_type").setValue("send")
             .addOnCompleteListener(new OnCompleteListener<Void>() {
-                 @Override
+
+                @Override
                  public void onComplete(@NonNull Task<Void> task) {
                      if (task.isSuccessful()) {
                          friendRequestRef.child(friendId).child(currentUser.getUid())
                              .child("request_type").setValue("received")
                                  .addOnSuccessListener(new OnSuccessListener<Void>() {
+
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         requestButton.setEnabled(true);
                                         currentStatus = REQUEST_SENT;
                                         requestButton.setText(CANCEL_FRIEND_REQUEST);
                                     }
+
                                  });
                      }
                  }
+
             });
+
     }
 
     private void cancelFriendRequest() {
 
         friendRequestRef.child(currentUser.getUid()).child(friendId).removeValue()
               .addOnSuccessListener(new OnSuccessListener<Void>() {
-                   @Override
+
+                  @Override
                    public void onSuccess(Void aVoid) {
                        friendRequestRef.child(friendId).child(currentUser.getUid()).removeValue()
                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+
                                @Override
                                public void onSuccess(Void aVoid) {
                                    requestButton.setEnabled(true);
                                    currentStatus = NOT_FRIENDS;
                                    requestButton.setText(SEND_FRIEND_REQUEST);
                                }
+
                            });
                    }
+
               });
+
     }
 
     private void acceptFriendRequest() {
+        final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
 
+        friendDatabaseRef.child(currentUser.getUid()).child(friendId).setValue(currentDate)
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                @Override
+                public void onSuccess(Void aVoid) {
+                    friendDatabaseRef.child(friendId).child(currentUser.getUid())
+                        .setValue(currentDate)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                friendRequestRef.child(currentUser.getUid()).child(friendId)
+                                     .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        friendRequestRef.child(friendId).child(currentUser.getUid())
+                                           .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                requestButton.setEnabled(true);
+                                                currentStatus = FRIENDS;
+                                                requestButton.setText(UNFRIEND);
+                                            }
+
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                requestButton.setEnabled(true);
+                                            }
+                                        });
+                                    }
+
+                                });
+                            }
+
+                        });
+                }
+
+            });
+
+    }
+
+
+    private void unfriendUser(){
+        friendDatabaseRef.child(currentUser.getUid()).child(friendId)
+                         .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                friendDatabaseRef.child(friendId).child(currentUser.getUid())
+                                 .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        requestButton.setEnabled(true);
+                        currentStatus = NOT_FRIENDS;
+                        requestButton.setText(SEND_FRIEND_REQUEST);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        requestButton.setEnabled(true);
+                    }
+                });
+            }
+        });
     }
 
     @Override
