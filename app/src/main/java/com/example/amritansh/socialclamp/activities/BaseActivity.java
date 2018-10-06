@@ -100,7 +100,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             case R.id.settings: {
                 Intent settingIntent = new Intent(this, AccountSettingActivity.class);
                 startActivity(settingIntent);
-                finish();
                 break;
             }
 
@@ -108,14 +107,12 @@ public abstract class BaseActivity extends AppCompatActivity {
                 mAuth.signOut();
                 Intent intent = new Intent(this, AuthenticationActivity.class);
                 startActivity(intent);
-                finish();
                 break;
             }
 
             case R.id.all_users: {
                 Intent allUsersIntent = new Intent(this, AllUsersActivity.class);
                 startActivity(allUsersIntent);
-                finish();
                 break;
             }
 

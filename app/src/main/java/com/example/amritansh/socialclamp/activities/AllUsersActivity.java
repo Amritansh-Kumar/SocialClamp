@@ -1,7 +1,7 @@
 package com.example.amritansh.socialclamp.activities;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,9 +9,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.example.amritansh.socialclamp.R;
+import com.example.amritansh.socialclamp.fragments.UserProfileFragment;
 import com.example.amritansh.socialclamp.models.User;
+import com.example.amritansh.socialclamp.models.interfaces.UserRowClickListner;
 import com.example.amritansh.socialclamp.views.AllUsersViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -21,13 +24,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AllUsersActivity extends BaseActivity {
+public class AllUsersActivity extends BaseActivity implements UserRowClickListner {
 
     private DatabaseReference databaseRef;
     private FirebaseRecyclerAdapter adapter;
 
     @BindView(R.id.all_users_rv)
     RecyclerView usersRecycler;
+    @BindView(R.id.user_container)
+    FrameLayout userContainer;
 
     @Override
     protected boolean showActionBar() {
@@ -76,19 +81,19 @@ public class AllUsersActivity extends BaseActivity {
 
         adapter = new FirebaseRecyclerAdapter<User, AllUsersViewHolder>
                 (options) {
-
+            Context context;
             @NonNull
             @Override
             public AllUsersViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
                 View view = LayoutInflater.from(viewGroup.getContext())
                                           .inflate(R.layout.all_users_row, viewGroup, false);
-
+                context = viewGroup.getContext();
                 return new AllUsersViewHolder(view);
             }
 
             @Override
             protected void onBindViewHolder(@NonNull AllUsersViewHolder holder, int position, @NonNull User model) {
-                holder.setDisplayData(model);
+                holder.setDisplayData(model, getRef(position).getKey(), context);
             }
         };
         adapter.startListening();
@@ -100,4 +105,14 @@ public class AllUsersActivity extends BaseActivity {
         super.onStop();
         adapter.stopListening();
     }
+
+    @Override
+    public void onRowClickedListner(String userId) {
+        usersRecycler.setVisibility(View.GONE);
+        userContainer.setVisibility(View.VISIBLE);
+
+        UserProfileFragment fragment  = UserProfileFragment.getInstance(userId);
+        super.replaceFragment(R.id.user_container, fragment, true);
+    }
+
 }
