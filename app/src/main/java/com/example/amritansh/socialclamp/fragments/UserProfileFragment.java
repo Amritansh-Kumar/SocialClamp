@@ -58,14 +58,13 @@ public class UserProfileFragment extends Fragment {
     public UserProfileFragment() {
     }
 
-    public static UserProfileFragment getInstance(String userId){
+    public static UserProfileFragment getInstance(String userId) {
         Bundle bundle = new Bundle();
         bundle.putString(USER_ID, userId);
         UserProfileFragment fragment = new UserProfileFragment();
         fragment.setArguments(bundle);
         return fragment;
     }
-
 
 
     @Override
@@ -97,7 +96,6 @@ public class UserProfileFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String name = dataSnapshot.child("username").getValue().toString();
-                Log.d("console", "userimagese" + name);
                 String status = dataSnapshot.child("status").getValue().toString();
                 String thumbImage = dataSnapshot.child("thumb_image").getValue().toString();
 
@@ -109,27 +107,27 @@ public class UserProfileFragment extends Fragment {
                        .into(userImage);
 
                 // ____________________ REQUEST STATE ______________
-                friendRequestRef.child("friend_request").addListenerForSingleValueEvent(new
-                                                                                       ValueEventListener() {
+                friendRequestRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild(friendId)){
-                            String requestType = dataSnapshot.child(friendId).child("request_type")
-                                    .getValue().toString();
+                        if (dataSnapshot.hasChild(currentUser.getUid())) {
 
-                            switch (requestType){
+                            String requestType = dataSnapshot.child(currentUser.getUid()).child(friendId)
+                                                             .child("request_type").getValue().toString();
 
-                                case "send":{
+                            switch (requestType) {
+
+                                case "send": {
                                     currentStatus = REQUEST_SENT;
                                     requestButton.setText(CANCEL_FRIEND_REQUEST);
                                     break;
                                 }
-                                case "received":{
+                                case "received": {
                                     currentStatus = REQUEST_RECEIVED;
                                     requestButton.setText(ACCEPT_FRIEND_REQUEST);
                                     break;
                                 }
-                                default:{
+                                default: {
                                     break;
                                 }
                             }
@@ -153,55 +151,71 @@ public class UserProfileFragment extends Fragment {
 
 
     @OnClick(R.id.request_btn)
-    void acceptOrSendRequest(){
+    void acceptOrSendRequest() {
 
         requestButton.setEnabled(false);
 
         // _____________________ SEND FRIEND REQUEST _______________________
-        if (currentStatus.equals("not_friends")){
-            friendRequestRef.child(currentUser.getUid()).child(friendId).child("request_type").setValue
-                    ("send")
-                                             .addOnCompleteListener
-                    (new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()){
-                        friendRequestRef.child(friendId).child(currentUser.getUid()).child
-                                ("request_type")
-                                                                     .setValue("received")
-                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                         @Override
-                                         public void onSuccess(Void aVoid) {
-                                             requestButton.setEnabled(true);
-                                             currentStatus = REQUEST_SENT;
-                                             requestButton.setText(CANCEL_FRIEND_REQUEST);
-                                         }
-                                     });
-                    }
-                }
-            });
+        if (currentStatus.equals(NOT_FRIENDS)) {
+            sendFriendRequest();
         }
 
         // ________________________ CANCEL FRIEND REQEUST ___________________________
-        if (currentStatus.equals("request_sent")){
-            friendRequestRef.child(currentUser.getUid()).child(friendId).removeValue()
-                            .addOnSuccessListener(new
-                                                                                         OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    friendRequestRef.child(friendId).child(currentUser.getUid()).removeValue()
-                                                                 .addOnSuccessListener(new
-                                                                                                 OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            requestButton.setEnabled(true);
-                            currentStatus = NOT_FRIENDS;
-                            requestButton.setText(SEND_FRIEND_REQUEST);
-                        }
-                    });
-                }
-            });
+        else if (currentStatus.equals(REQUEST_SENT)) {
+            cancelFriendRequest();
         }
+
+        else if(currentStatus.equals(REQUEST_RECEIVED)) {
+            acceptFriendRequest();
+        }
+
+
+
+    }
+
+
+    private void sendFriendRequest() {
+        friendRequestRef.child(currentUser.getUid()).child(friendId)
+            .child("request_type").setValue("send")
+            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                 @Override
+                 public void onComplete(@NonNull Task<Void> task) {
+                     if (task.isSuccessful()) {
+                         friendRequestRef.child(friendId).child(currentUser.getUid())
+                             .child("request_type").setValue("received")
+                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        requestButton.setEnabled(true);
+                                        currentStatus = REQUEST_SENT;
+                                        requestButton.setText(CANCEL_FRIEND_REQUEST);
+                                    }
+                                 });
+                     }
+                 }
+            });
+    }
+
+    private void cancelFriendRequest() {
+
+        friendRequestRef.child(currentUser.getUid()).child(friendId).removeValue()
+              .addOnSuccessListener(new OnSuccessListener<Void>() {
+                   @Override
+                   public void onSuccess(Void aVoid) {
+                       friendRequestRef.child(friendId).child(currentUser.getUid()).removeValue()
+                           .addOnSuccessListener(new OnSuccessListener<Void>() {
+                               @Override
+                               public void onSuccess(Void aVoid) {
+                                   requestButton.setEnabled(true);
+                                   currentStatus = NOT_FRIENDS;
+                                   requestButton.setText(SEND_FRIEND_REQUEST);
+                               }
+                           });
+                   }
+              });
+    }
+
+    private void acceptFriendRequest() {
 
     }
 
