@@ -7,17 +7,29 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.example.amritansh.socialclamp.activities.HomeActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
-
+    private FirebaseUser mAuth = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference mReference = FirebaseDatabase.getInstance().getReference().child
+            ("Users");
 
     private static final String TAG = "FirebaseMessagingServce";
     private static final int ONGOING_NOTIFICATION_ID = 1;
@@ -63,6 +75,33 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     }
 
+    @Override
+    public void onNewToken(String token) {
+        Log.d(TAG, "Refreshed token: " + token);
 
+        // If you want to send messages to this application instance or
+        // manage this apps subscriptions on the server side, send the
+        // Instance ID token to your app server.
+        sendRegistrationToServer(token);
+    }
+
+    private void sendRegistrationToServer(String token) {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                          .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                              @Override
+                              public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                  String token = task.getResult().getToken();
+
+                                  mReference.child(mAuth.getUid()).child
+                                          ("token").setValue(token)
+                                           .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                               @Override
+                                               public void onSuccess(Void aVoid) {
+                                                   // Token added successfully
+                                               }
+                                           });
+                              }
+                          });
+    }
 
 }

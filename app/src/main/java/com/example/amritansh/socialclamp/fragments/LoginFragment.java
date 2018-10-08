@@ -15,10 +15,15 @@ import com.example.amritansh.socialclamp.R;
 import com.example.amritansh.socialclamp.activities.HomeActivity;
 import com.example.amritansh.socialclamp.models.interfaces.AuthenticationListner;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,6 +39,7 @@ public class LoginFragment extends Fragment {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private FirebaseUser mUser;
     private static AuthenticationListner listner;
+    private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
     public LoginFragment() {
     }
@@ -70,10 +76,29 @@ public class LoginFragment extends Fragment {
                  .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                      @Override
                      public void onComplete(@NonNull Task<AuthResult> task) {
+
                          if (task.isSuccessful()) {
-                             mUser = mAuth.getCurrentUser();
-                             startActivity(HomeActivity.newInstance(getContext()));
-                             getActivity().finish();
+
+                             FirebaseInstanceId.getInstance().getInstanceId()
+                                               .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                                   @Override
+                                                   public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                                       String token = task.getResult().getToken();
+
+                                                       mDatabase.child(mAuth.getUid()).child
+                                                               ("token").setValue(token)
+                                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                     @Override
+                                                                     public void onSuccess(Void aVoid) {
+                                                                         // Token added successfully
+                                                                         mUser = mAuth.getCurrentUser();
+                                                                         startActivity(HomeActivity.newInstance(getContext()));
+                                                                         getActivity().finish();
+                                                                     }
+                                                                 });
+                                                   }
+                                               });
+
                          } else {
                              Toast.makeText(getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
                          }

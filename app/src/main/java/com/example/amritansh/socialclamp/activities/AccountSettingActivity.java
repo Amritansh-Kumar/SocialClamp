@@ -132,7 +132,7 @@ public class AccountSettingActivity extends BaseActivity {
 //        startActivityForResult(Intent.createChooser(imageIntent, "SELECT IMAGE"), IMAGE_PICK);
 
         CropImage.activity()
-                 .setAspectRatio(16, 9)
+                 .setAspectRatio(1, 1)
                  .setOutputCompressQuality(100)
                  .setGuidelines(CropImageView.Guidelines.ON)
                  .start(this);

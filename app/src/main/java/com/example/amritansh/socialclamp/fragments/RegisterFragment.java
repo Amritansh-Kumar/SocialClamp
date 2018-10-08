@@ -17,12 +17,15 @@ import com.example.amritansh.socialclamp.R;
 import com.example.amritansh.socialclamp.activities.HomeActivity;
 import com.example.amritansh.socialclamp.models.interfaces.AuthenticationListner;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.HashMap;
 
@@ -37,7 +40,7 @@ public class RegisterFragment extends Fragment {
 
     private static AuthenticationListner listner;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
     private AlertDialog alertDialog;
 
     @BindView(R.id.reg_user_name)
@@ -85,19 +88,34 @@ public class RegisterFragment extends Fragment {
                          if (task.isSuccessful()) {
 
                              FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
-                             String uid = mUser.getUid();
-                             DatabaseReference myRef = mDatabase.getReference().child("Users")
-                                                                .child(uid);
+                             final String uid = mUser.getUid();
                              HashMap<String, String> userMap = getDefaultUserData(name);
 
-                             myRef.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                             mDatabase.child(uid).setValue(userMap).addOnCompleteListener(new
+                                                                               OnCompleteListener<Void>() {
                                  @Override
                                  public void onComplete(@NonNull Task<Void> task) {
                                      // TODO : add alert dialog to show loading
 
-                                     startActivity(HomeActivity.newInstance(getContext()));
+                                     FirebaseInstanceId.getInstance().getInstanceId()
+                                                       .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                                           @Override
+                                                           public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                                               String token = task.getResult().getToken();
 
-                                     getActivity().finish();
+                                                               mDatabase.child(uid).child
+                                                                       ("token").setValue(token)
+                                                                       .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                           @Override
+                                                                           public void onSuccess(Void aVoid) {
+                                                                               startActivity(HomeActivity.newInstance(getContext()));
+
+                                                                               getActivity().finish();
+                                                                           }
+                                                                       });
+                                                           }
+                                                       });
+
                                  }
                              });
                          } else {
@@ -120,4 +138,6 @@ public class RegisterFragment extends Fragment {
 
         return userMap;
     }
+
+
 }
