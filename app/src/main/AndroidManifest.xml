@@ -32,7 +32,12 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:parentActivityName=".activities.AccountSettingActivity"
-            android:theme="@style/Base.Theme.AppCompat" />
+            android:theme="@style/Base.Theme.AppCompat" >
+            <intent-filter>
+                <action android:name="com.example.amritansh.socialclamp" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.AllUsersActivity"
             android:parentActivityName=".activities.HomeActivity" />

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.amritansh.socialclamp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -147,7 +148,8 @@ public class AccountSettingActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+
+        if (requestCode == REQUEST_CODE) {
             String status = data.getStringExtra(STATUS);
 
             mReference.child("status").setValue(status).addOnCompleteListener(new OnCompleteListener<Void>() {

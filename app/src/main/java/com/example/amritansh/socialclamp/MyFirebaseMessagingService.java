@@ -1,12 +1,7 @@
 package com.example.amritansh.socialclamp;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -31,6 +26,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private DatabaseReference mReference = FirebaseDatabase.getInstance().getReference().child
             ("Users");
 
+
     private static final String TAG = "FirebaseMessagingServce";
     private static final int ONGOING_NOTIFICATION_ID = 1;
     private static final Object CHANNEL_ID = 2;
@@ -38,9 +34,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
-        Log.d("notification", "notificationreceived");
+        String notificationTitle = remoteMessage.getNotification().getTitle();
+        String notificationBody = remoteMessage.getNotification().getBody();
+        String clickAction = remoteMessage.getNotification().getClickAction();
 
-        String notificationTitle = null, notificationBody = null;
+        String senderId = remoteMessage.getData().get("sender_id");
+
+        Log.d("notification", "notificationreceived");
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
@@ -51,11 +51,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
-        sendNotification(notificationTitle, notificationBody);
+        sendNotification(notificationTitle, notificationBody, clickAction,senderId);
     }
 
 
-    private void sendNotification(String notificationTitle, String notificationBody) {
+    private void sendNotification(String notificationTitle, String notificationBody, String
+            clickAction, String senderId) {
+
         Intent intent = new Intent(this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
