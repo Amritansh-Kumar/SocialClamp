@@ -46,6 +46,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:17.3.3'
 
     implementation "com.android.support:support-compat:28.0.0"
+    implementation "com.squareup.okhttp3:okhttp:3.11.0"
 
 
 

@@ -23,6 +23,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -86,6 +88,7 @@ public class AccountSettingActivity extends BaseActivity {
         mReference = mDatabase.getReference().child("Users").child(currentUser.getUid());
         mStorageRef = FirebaseStorage.getInstance().getReference().child("profile_image");
 
+        mReference.keepSynced(true);
         updateUserDetails();
     }
 
@@ -99,7 +102,7 @@ public class AccountSettingActivity extends BaseActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String username = dataSnapshot.child("username").getValue().toString();
                 String status = dataSnapshot.child("status").getValue().toString();
-                String image = dataSnapshot.child("image").getValue().toString();
+                final String image = dataSnapshot.child("image").getValue().toString();
                 String thumbImage = dataSnapshot.child("thumb_image").getValue().toString();
 
                 mUsername.setText(username);
@@ -108,10 +111,26 @@ public class AccountSettingActivity extends BaseActivity {
                 if (!image.matches("default")){
                     Picasso.get()
                            .load(image)
+                           .networkPolicy(NetworkPolicy.OFFLINE)
                            .resize(50, 50)
                            .centerCrop()
                            .placeholder(R.drawable.useravtar)
-                           .into(userAvtar);
+                           .into(userAvtar, new Callback() {
+                               @Override
+                               public void onSuccess() {
+
+                               }
+
+                               @Override
+                               public void onError(Exception e) {
+                                   Picasso.get()
+                                          .load(image)
+                                          .resize(50, 50)
+                                          .centerCrop()
+                                          .placeholder(R.drawable.useravtar)
+                                          .into(userAvtar);
+                               }
+                           });
                 }
 
                 // TODO : dismiss progress bar
