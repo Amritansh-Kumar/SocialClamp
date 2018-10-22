@@ -365,8 +365,10 @@ public class UserProfileFragment extends Fragment {
         final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
 
         Map acceptRequestMap = new HashMap();
-        acceptRequestMap.put("friends/" + currentUser.getUid() + "/" + friendId, currentDate);
-        acceptRequestMap.put("friends/" + friendId + "/" + currentUser.getUid(), currentDate);
+        acceptRequestMap.put("friends/" + currentUser.getUid() + "/" + friendId + "/date",
+                currentDate);
+        acceptRequestMap.put("friends/" + friendId + "/" + currentUser.getUid() + "/date",
+                currentDate);
 
         acceptRequestMap.put("friend_request/" + currentUser.getUid() + "/" + friendId,
                 null);
