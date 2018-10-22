@@ -67,6 +67,8 @@ public class UserProfileFragment extends Fragment {
     ImageView userImage;
     @BindView(R.id.request_btn)
     Button requestButton;
+    @BindView(R.id.decline_btn)
+    Button declineButton;
 
     public UserProfileFragment() {
     }
@@ -107,6 +109,8 @@ public class UserProfileFragment extends Fragment {
 
         userProfileRef = FirebaseDatabase.getInstance().getReference().child("Users")
                                          .child(friendId);
+
+        declineButton.setVisibility(View.INVISIBLE);
         fillUserData();
     }
 
@@ -164,6 +168,7 @@ public class UserProfileFragment extends Fragment {
                                         break;
                                     }
                                     case "received": {
+                                        declineButton.setVisibility(View.VISIBLE);
                                         currentStatus = REQUEST_RECEIVED;
                                         requestButton.setText(ACCEPT_FRIEND_REQUEST);
                                         break;
@@ -469,6 +474,33 @@ public class UserProfileFragment extends Fragment {
 //                });
 //            }
 //        });
+    }
+
+
+    @OnClick(R.id.decline_btn)
+    void declineRequest(){
+
+        Map requestMap = new HashMap();
+        requestMap.put("friend_request/" + currentUser.getUid() + "/" + friendId, null);
+        requestMap.put("friend_request/" + friendId + "/" + currentUser.getUid(), null);
+
+        mRootRef.updateChildren(requestMap, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+
+                if (databaseError != null){
+                    Toast.makeText(getActivity(), "Something went wrong",
+                            Toast.LENGTH_SHORT).show();
+                }else {
+                    currentStatus = NOT_FRIENDS;
+                    requestButton.setText(SEND_FRIEND_REQUEST);
+                }
+                requestButton.setEnabled(true);
+                declineButton.setVisibility(View.INVISIBLE);
+
+            }
+        });
+
     }
 
     @Override
