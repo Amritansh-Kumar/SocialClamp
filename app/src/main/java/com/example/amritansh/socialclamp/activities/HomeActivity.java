@@ -93,12 +93,16 @@ public class HomeActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        userDatabase.child("online").setValue(true);
+        if (mAuth.getCurrentUser() != null) {
+            userDatabase.child("online").setValue(true);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        userDatabase.child("online").setValue(false);
+        if (mAuth.getCurrentUser() != null) {
+            userDatabase.child("online").setValue(false);
+        }
     }
 }
