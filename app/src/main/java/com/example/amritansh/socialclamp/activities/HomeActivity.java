@@ -8,6 +8,8 @@ import android.os.Bundle;
 
 import com.example.amritansh.socialclamp.R;
 import com.example.amritansh.socialclamp.adapters.PagerAdapter;
+import com.example.amritansh.socialclamp.fragments.ChatFragment;
+import com.example.amritansh.socialclamp.fragments.FriendsFragment;
 import com.example.amritansh.socialclamp.fragments.RequestsFragment;
 import com.example.amritansh.socialclamp.models.ViewPagerItem;
 import com.google.firebase.auth.FirebaseAuth;
@@ -73,8 +75,8 @@ public class HomeActivity extends BaseActivity {
         pagerAdapter = new PagerAdapter(getSupportFragmentManager());
 
         pagerItemList.add(new ViewPagerItem(RequestsFragment.createFragment(), "Requests"));
-        pagerItemList.add(new ViewPagerItem(RequestsFragment.createFragment(), "Chats"));
-        pagerItemList.add(new ViewPagerItem(RequestsFragment.createFragment(), "Friends"));
+        pagerItemList.add(new ViewPagerItem(ChatFragment.createFragment(), "Chats"));
+        pagerItemList.add(new ViewPagerItem(FriendsFragment.createFragment(), "Friends"));
 
         viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
