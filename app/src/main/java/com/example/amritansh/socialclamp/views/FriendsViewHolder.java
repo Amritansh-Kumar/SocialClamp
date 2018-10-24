@@ -3,6 +3,7 @@ package com.example.amritansh.socialclamp.views;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.amritansh.socialclamp.R;
@@ -23,6 +24,8 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
     TextView username;
     @BindView(R.id.userstatus)
     TextView userStatus;
+    @BindView(R.id.online_img)
+    ImageView onlineImage;
 
     public FriendsViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -30,7 +33,8 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, mView);
     }
 
-    public void setDisplayData(String thumbUrl, String username, String status, String userId) {
+    public void setDisplayData(String thumbUrl, String username, String status, String userId,
+                               String isOnline) {
         this.userId = userId;
 
         Picasso.get()
@@ -41,5 +45,10 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
         this.username.setText(username);
         userStatus.setText(status);
 
+        if (isOnline.equals("true")){
+            onlineImage.setVisibility(View.VISIBLE);
+        }else {
+            onlineImage.setVisibility(View.INVISIBLE);
+        }
     }
 }

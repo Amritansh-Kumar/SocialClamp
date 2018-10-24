@@ -22,6 +22,14 @@
         android:src="@drawable/useravtar"
         />
 
+    <ImageView
+        android:id="@+id/online_img"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/online"
+        android:visibility="invisible"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -34,9 +42,10 @@
         android:layout_weight="1"
         android:layout_gravity="center"
         android:gravity="center_vertical"
-        android:layout_margin="8dp"
-        android:textSize="17sp"
-        android:text="sfsf" />
+        android:layout_marginTop="8dp"
+        android:textSize="19sp"
+        android:text="sfsf"
+        android:textStyle="bold|italic"/>
 
     <TextView
         android:id="@+id/userstatus"
@@ -44,10 +53,11 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:textSize="16sp"
-        android:layout_margin="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_gravity="center"
         android:gravity="top"
-        android:text="sdfsfsd"/>
+        android:text="sdfsfsd"
+        android:textStyle="italic"/>
 
     </LinearLayout>
 

@@ -101,8 +101,9 @@ public class FriendsFragment extends Fragment {
                         String username = dataSnapshot.child("username").getValue().toString();
                         String thumbUrl = dataSnapshot.child("thumb_image").getValue().toString();
                         String status = dataSnapshot.child("status").getValue().toString();
+                        String online = String.valueOf(dataSnapshot.child("online").getValue());
 
-                        holder.setDisplayData(thumbUrl, username, status, friendId);
+                        holder.setDisplayData(thumbUrl, username, status, friendId, online);
                     }
 
                     @Override

@@ -14,6 +14,8 @@ import com.example.amritansh.socialclamp.fragments.RequestsFragment;
 import com.example.amritansh.socialclamp.models.ViewPagerItem;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ public class HomeActivity extends BaseActivity {
     private List<ViewPagerItem> pagerItemList = new ArrayList<>();
 
     private FirebaseAuth mAuth;
+    private DatabaseReference userDatabase;
 
     public static Intent newInstance(Context context) {
         return new Intent(context, HomeActivity.class);
@@ -62,6 +65,9 @@ public class HomeActivity extends BaseActivity {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
+        userDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child
+                (currentUser.getUid());
+
         if (currentUser == null){
             Intent intent = new Intent(this, AuthenticationActivity.class);
             startActivity(intent);
@@ -84,5 +90,15 @@ public class HomeActivity extends BaseActivity {
         tabLayout.setHorizontalScrollBarEnabled(true);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        userDatabase.child("online").setValue(true);
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        userDatabase.child("online").setValue(false);
+    }
 }
