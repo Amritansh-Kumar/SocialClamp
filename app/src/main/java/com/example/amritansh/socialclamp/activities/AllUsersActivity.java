@@ -111,7 +111,7 @@ public class AllUsersActivity extends BaseActivity implements UserRowClickListne
         usersRecycler.setVisibility(View.GONE);
         userContainer.setVisibility(View.VISIBLE);
 
-        UserProfileFragment fragment  = UserProfileFragment.getInstance(userId);
+        UserProfileFragment fragment  = UserProfileFragment.getInstance(userId, "allUser");
         super.replaceFragment(R.id.user_container, fragment, true);
     }
 

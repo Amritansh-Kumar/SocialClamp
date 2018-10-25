@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.amritansh.socialclamp.R;
+import com.example.amritansh.socialclamp.activities.ChatActivity;
+import com.example.amritansh.socialclamp.activities.ProfileActivity;
 import com.example.amritansh.socialclamp.fragments.UserProfileFragment;
 import com.squareup.picasso.Picasso;
 
@@ -66,8 +68,24 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
                           .setItems(optionsList, new DialogInterface.OnClickListener() {
                               @Override
                               public void onClick(DialogInterface dialog, int which) {
+                                  switch (which) {
 
+                                      case 0:
+                                          Intent profileIntent = new Intent(itemView.getContext()
+                                                  , ProfileActivity.class);
+                                          profileIntent.putExtra("userId", userId);
+                                          itemView.getContext().startActivity(profileIntent);
+                                          break;
+                                      case 1:
+                                          Intent chatIntent = new Intent(itemView.getContext(),
+                                                  ChatActivity.class);
+                                          chatIntent.putExtra("userId", userId);
+                                          itemView.getContext().startActivity(chatIntent);
+                                          break;
+                                      default:
+                                          break;
 
+                                  }
 
                               }
                           });

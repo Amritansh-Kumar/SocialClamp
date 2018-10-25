@@ -40,6 +40,7 @@ import butterknife.OnClick;
 public class UserProfileFragment extends Fragment {
 
     private static final String USER_ID = "userId";
+    private static final String CALLING_ACTIVITY = "callingActivity";
     private static final String SEND_FRIEND_REQUEST = "SEND FRIEND REQUEST";
     private static final String CANCEL_FRIEND_REQUEST = "CANCEL FRIEND REQUEST";
     private static final String ACCEPT_FRIEND_REQUEST = "ACCEPT FRIEND REQUEST";
@@ -57,6 +58,7 @@ public class UserProfileFragment extends Fragment {
     private FirebaseUser currentUser;
 
     private String friendId;
+    private String callingActivity;
     private String currentStatus = NOT_FRIENDS;
 
     @BindView(R.id.username)
@@ -73,9 +75,10 @@ public class UserProfileFragment extends Fragment {
     public UserProfileFragment() {
     }
 
-    public static UserProfileFragment getInstance(String userId) {
+    public static UserProfileFragment getInstance(String userId, String callingActivity) {
         Bundle bundle = new Bundle();
         bundle.putString(USER_ID, userId);
+        bundle.putString(CALLING_ACTIVITY, callingActivity);
         UserProfileFragment fragment = new UserProfileFragment();
         fragment.setArguments(bundle);
         return fragment;
@@ -96,6 +99,7 @@ public class UserProfileFragment extends Fragment {
 
         Bundle bundle = getArguments();
         friendId = bundle.getString(USER_ID);
+        callingActivity = bundle.getString(CALLING_ACTIVITY);
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -508,10 +512,12 @@ public class UserProfileFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        View userView = getActivity().findViewById(R.id.all_users_rv);
-        View container = getActivity().findViewById(R.id.user_container);
-        container.setVisibility(View.GONE);
-        userView.setVisibility(View.VISIBLE);
+        if (callingActivity.equals("allUser")) {
+            View userView = getActivity().findViewById(R.id.all_users_rv);
+            View container = getActivity().findViewById(R.id.user_container);
+            container.setVisibility(View.GONE);
+            userView.setVisibility(View.VISIBLE);
+        }
     }
 
 
