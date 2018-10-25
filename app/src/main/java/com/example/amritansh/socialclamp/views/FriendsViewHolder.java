@@ -1,5 +1,8 @@
 package com.example.amritansh.socialclamp.views;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -7,10 +10,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.amritansh.socialclamp.R;
+import com.example.amritansh.socialclamp.fragments.UserProfileFragment;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendsViewHolder extends RecyclerView.ViewHolder {
@@ -50,5 +55,23 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
         }else {
             onlineImage.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @OnClick(R.id.user_row)
+    public void selectAction(){
+        String[] optionsList = {"Open Profile", "Send Message"};
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(itemView.getContext());
+        alertDialogBuilder.setTitle("Select Options")
+                          .setItems(optionsList, new DialogInterface.OnClickListener() {
+                              @Override
+                              public void onClick(DialogInterface dialog, int which) {
+
+
+
+                              }
+                          });
+
+        alertDialogBuilder.show();
     }
 }
