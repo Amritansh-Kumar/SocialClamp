@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.example.amritansh.socialclamp.R;
 import com.example.amritansh.socialclamp.activities.ChatActivity;
 import com.example.amritansh.socialclamp.activities.ProfileActivity;
-import com.example.amritansh.socialclamp.fragments.UserProfileFragment;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -22,8 +21,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendsViewHolder extends RecyclerView.ViewHolder {
 
+    private static final String USER_ID = "user_id";
+    private static final String USERNAME = "username";
+
     private View mView;
     private String userId;
+    private String usernameTxt;
 
     @BindView(R.id.useravtar)
     CircleImageView userAvtar;
@@ -43,6 +46,7 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
     public void setDisplayData(String thumbUrl, String username, String status, String userId,
                                String isOnline) {
         this.userId = userId;
+        this.usernameTxt = username;
 
         Picasso.get()
                .load(thumbUrl)
@@ -79,7 +83,8 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
                                       case 1:
                                           Intent chatIntent = new Intent(itemView.getContext(),
                                                   ChatActivity.class);
-                                          chatIntent.putExtra("userId", userId);
+                                          chatIntent.putExtra(USER_ID, userId);
+                                          chatIntent.putExtra(USERNAME, usernameTxt);
                                           itemView.getContext().startActivity(chatIntent);
                                           break;
                                       default:

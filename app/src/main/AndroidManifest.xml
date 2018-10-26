@@ -57,8 +57,9 @@
                 android:resource="@color/orange" />
         </service>
 
-        <activity android:name=".activities.ProfileActivity" />
-        <activity android:name=".activities.ChatActivity"></activity>
+        <activity android:name=".activities.ProfileActivity"/>
+        <activity android:name=".activities.ChatActivity"
+            android:parentActivityName=".activities.HomeActivity"/>
     </application>
 
 </manifest>
