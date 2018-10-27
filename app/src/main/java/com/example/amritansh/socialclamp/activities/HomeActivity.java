@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,7 +103,7 @@ public class HomeActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
         if (mAuth.getCurrentUser() != null) {
-            userDatabase.child("online").setValue(false);
+            userDatabase.child("online").setValue(ServerValue.TIMESTAMP);
         }
     }
 }

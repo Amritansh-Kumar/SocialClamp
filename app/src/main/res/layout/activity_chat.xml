@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.ChatActivity">
+    tools:context=".activities.ChatActivity"
+    android:background="@color/grey">
 
     <include
         layout="@layout/toolbar_chat"
@@ -16,13 +17,11 @@
         android:id="@+id/message_footer"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="8dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@color/white">
 
         <ImageView
             android:id="@+id/chat_add"
@@ -30,7 +29,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:src="@drawable/add"
-            android:tint="@color/orange" />
+            android:tint="@color/orange"
+            android:padding="4dp"/>
 
         <EditText
             android:id="@+id/chat_message"
@@ -50,7 +50,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:src="@drawable/arrow"
-            android:tint="@color/orange" />
+            android:tint="@color/orange"
+            android:padding="4dp"/>
 
     </LinearLayout>
 
