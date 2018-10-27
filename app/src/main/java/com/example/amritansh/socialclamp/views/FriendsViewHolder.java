@@ -65,7 +65,7 @@ public class FriendsViewHolder extends RecyclerView.ViewHolder {
 
     @OnClick(R.id.user_row)
     public void selectAction(){
-        String[] optionsList = {"Open Profile", "Send Message"};
+        String[] optionsList = {"Open Profile", "Send Messages"};
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(itemView.getContext());
         alertDialogBuilder.setTitle("Select Options")

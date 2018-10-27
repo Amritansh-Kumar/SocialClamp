@@ -32,22 +32,26 @@ public class SocialClampApp extends Application {
         Picasso.setSingletonInstance(build);
 
         mAuth = FirebaseAuth.getInstance();
-        userReference = FirebaseDatabase.getInstance().getReference().child("Users")
-                                        .child(mAuth.getCurrentUser().getUid());
 
-        userReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null){
-                    userReference.child("online").onDisconnect().setValue(ServerValue.TIMESTAMP);
+        if (mAuth.getCurrentUser() != null) {
+
+            userReference = FirebaseDatabase.getInstance().getReference().child("Users")
+                                            .child(mAuth.getCurrentUser().getUid());
+
+            userReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot != null) {
+                        userReference.child("online").onDisconnect().setValue(ServerValue.TIMESTAMP);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
     }
 
 }

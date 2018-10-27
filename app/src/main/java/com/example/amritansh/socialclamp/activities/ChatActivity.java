@@ -3,16 +3,23 @@ package com.example.amritansh.socialclamp.activities;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.amritansh.socialclamp.R;
+import com.example.amritansh.socialclamp.adapters.MessageAdapter;
 import com.example.amritansh.socialclamp.applications.GetTimeAgo;
+import com.example.amritansh.socialclamp.models.Messages;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,7 +30,9 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -45,7 +54,13 @@ public class ChatActivity extends BaseActivity {
     private DatabaseReference userReference;
     private DatabaseReference rootReference;
 
-    @BindView(R.id.toolbar_chat)
+    private MessageAdapter messageAdapter;
+    private List<Messages> messagesList = new ArrayList<>();
+
+    @BindView(R.id.include)
+    View include;
+
+//    @BindView(R.id.toolbar_chat)
     android.support.v7.widget.Toolbar chatToolbar;
     @BindView(R.id.toolbar_username)
     TextView toolbarUsername;
@@ -55,6 +70,8 @@ public class ChatActivity extends BaseActivity {
     ImageView toolbarvtar;
     @BindView(R.id.chat_message)
     EditText chatMessage;
+    @BindView(R.id.message_rv)
+    RecyclerView messageRecycler;
 
     @Override
     protected boolean showActionBar() {
@@ -94,11 +111,16 @@ public class ChatActivity extends BaseActivity {
                 (getIntent().getStringExtra(USER_ID));
         rootReference = FirebaseDatabase.getInstance().getReference();
 
+        chatToolbar = new Toolbar(this);
+        ButterKnife.bind(chatToolbar, include);
+
         setSupportActionBar(chatToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         displayToolbarDetails();
         setupChatDatabase();
+        setUpMessageRecycler();
+        loadMessages();
     }
 
     private void displayToolbarDetails() {
@@ -201,7 +223,7 @@ public class ChatActivity extends BaseActivity {
                     .child(currentUser.getUid()).child(friendUser).push().getKey();
 
             Map messageMap = new HashMap();
-            messageMap.put("message", false);
+            messageMap.put("message", messageBody);
             messageMap.put("seen", false);
             messageMap.put("type", "text");
             messageMap.put("timestamp", ServerValue.TIMESTAMP);
@@ -221,5 +243,49 @@ public class ChatActivity extends BaseActivity {
                 }
             });
         }
+    }
+
+    private void setUpMessageRecycler() {
+
+        messageRecycler.setLayoutManager(new LinearLayoutManager(this));
+        messageAdapter = new MessageAdapter();
+        messageRecycler.setAdapter(messageAdapter);
+    }
+
+    private void loadMessages() {
+
+        rootReference.child("Messages").child(currentUser.getUid()).child(friendUser)
+                     .addChildEventListener(new ChildEventListener() {
+                         @Override
+                         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                             Messages message = dataSnapshot.getValue(Messages.class);
+                             messagesList.add(message);
+
+                             messageAdapter.updateMessageList(messagesList);
+
+                         }
+
+                         @Override
+                         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                         }
+
+                         @Override
+                         public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                         }
+
+                         @Override
+                         public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                         }
+
+                         @Override
+                         public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                         }
+                     });
+
     }
 }
