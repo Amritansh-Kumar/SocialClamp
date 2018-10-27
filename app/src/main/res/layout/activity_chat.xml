@@ -16,7 +16,7 @@
     <LinearLayout
         android:id="@+id/message_footer"
         android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_height="58dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -42,7 +42,9 @@
             android:backgroundTint="@color/orange"
             android:hint="Message"
             android:textColor="@color/orange"
-            android:textColorHint="@color/orange" />
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
+            android:textCursorDrawable="@null"/>
 
         <ImageView
             android:id="@+id/chat_send"
