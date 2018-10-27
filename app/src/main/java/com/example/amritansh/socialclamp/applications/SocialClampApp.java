@@ -32,7 +32,7 @@ public class SocialClampApp extends Application {
         Picasso.setSingletonInstance(build);
 
         mAuth = FirebaseAuth.getInstance();
-        userReference = FirebaseDatabase.getInstance().getReference().child("User")
+        userReference = FirebaseDatabase.getInstance().getReference().child("Users")
                                         .child(mAuth.getCurrentUser().getUid());
 
         userReference.addValueEventListener(new ValueEventListener() {
