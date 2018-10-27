@@ -57,10 +57,10 @@ public class ChatActivity extends BaseActivity {
     private MessageAdapter messageAdapter;
     private List<Messages> messagesList = new ArrayList<>();
 
-    @BindView(R.id.include)
-    View include;
+//    @BindView(R.id.include)
+//    View include;
 
-//    @BindView(R.id.toolbar_chat)
+    @BindView(R.id.toolbar_chat)
     android.support.v7.widget.Toolbar chatToolbar;
     @BindView(R.id.toolbar_username)
     TextView toolbarUsername;
@@ -111,8 +111,8 @@ public class ChatActivity extends BaseActivity {
                 (getIntent().getStringExtra(USER_ID));
         rootReference = FirebaseDatabase.getInstance().getReference();
 
-        chatToolbar = new Toolbar(this);
-        ButterKnife.bind(chatToolbar, include);
+//        chatToolbar = new Toolbar(this);
+//        ButterKnife.bind(chatToolbar, include);
 
         setSupportActionBar(chatToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
