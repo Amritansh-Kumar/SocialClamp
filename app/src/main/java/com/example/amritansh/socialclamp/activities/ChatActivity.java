@@ -250,6 +250,13 @@ public class ChatActivity extends BaseActivity {
         messageRecycler.setLayoutManager(new LinearLayoutManager(this));
         messageAdapter = new MessageAdapter();
         messageRecycler.setAdapter(messageAdapter);
+
+        messageRecycler.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                messageRecycler.scrollToPosition(messagesList.size() - 1);
+            }
+        });
     }
 
     private void loadMessages() {
@@ -263,6 +270,8 @@ public class ChatActivity extends BaseActivity {
                              messagesList.add(message);
 
                              messageAdapter.updateMessageList(messagesList);
+
+                             messageRecycler.scrollToPosition(messagesList.size() - 1);
 
                          }
 
