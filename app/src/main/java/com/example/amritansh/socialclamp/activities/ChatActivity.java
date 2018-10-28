@@ -227,18 +227,18 @@ public class ChatActivity extends BaseActivity {
             messageMap.put("seen", false);
             messageMap.put("type", "text");
             messageMap.put("timestamp", ServerValue.TIMESTAMP);
+            messageMap.put("from", currentUser.getUid());
 
             Map messageUserMap = new HashMap();
             messageUserMap.put(USER_MESSAGE_REFERNCE + "/" + messagePushId, messageMap);
             messageUserMap.put(FRIEND_MESSAGE_REFERNCE + "/" + messagePushId, messageMap);
 
+            chatMessage.setText(null);
             rootReference.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                     if (databaseError != null){
                         Log.d("MESSAGE_LOG", databaseError.getMessage());
-                    }else {
-                        chatMessage.setText(null);
                     }
                 }
             });

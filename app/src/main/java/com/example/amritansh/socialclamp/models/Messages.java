@@ -6,15 +6,17 @@ public class Messages {
     private boolean seen;
     private long timestamp;
     private String type;
+    private String from;
 
     public Messages(){
     }
 
-    public Messages(String message, boolean seen, long timestamp, String type) {
+    public Messages(String message, boolean seen, long timestamp, String type, String from) {
         this.message = message;
         this.seen = seen;
         this.timestamp = timestamp;
         this.type = type;
+        this.from = from;
     }
 
     public String getMessage() {
@@ -47,5 +49,13 @@ public class Messages {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
     }
 }
