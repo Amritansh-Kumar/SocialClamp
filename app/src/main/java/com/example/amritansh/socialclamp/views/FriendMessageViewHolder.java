@@ -10,12 +10,12 @@ import com.example.amritansh.socialclamp.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MessageViewHolder extends RecyclerView.ViewHolder {
+public class FriendMessageViewHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.message_text)
     TextView messageText;
 
-    public MessageViewHolder(@NonNull View itemView) {
+    public FriendMessageViewHolder(@NonNull View itemView) {
         super(itemView);
         ButterKnife.bind(this, itemView);
     }
